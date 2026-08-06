@@ -1,0 +1,837 @@
+
+{%- style -%}
+  .banner-overlap-{{ section.id }} {
+    position: relative;
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+@media (min-width: 701px) {
+  .banner-overlap-{{ section.id }} {
+    margin-bottom: -76px !important;
+  }
+}
+
+  .banner-overlap-{{ section.id }} .banner-overlap__image-wrap {
+    position: relative;
+    width: 100%;
+    height: {{ section.settings.image_height_mobile }}px;
+    overflow: hidden;
+    border-radius: var(--media-radius, 0);
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__image-wrap > img {
+    border-radius: 20px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .banner-overlap-{{ section.id }} .banner-overlap__image-wrap {
+      height: {{ section.settings.image_height }}px;
+    }
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__overlay {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: var(--overlay-opacity, 0);
+    pointer-events: none;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__content {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5% 6%;
+    max-width: 640px;
+    color: {{ section.settings.text_color }};
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__content--left { align-items: flex-start; text-align: left; }
+  .banner-overlap-{{ section.id }} .banner-overlap__content--center { align-items: center; text-align: center; margin-inline: auto; }
+  .banner-overlap-{{ section.id }} .banner-overlap__content--right { align-items: flex-end; text-align: right; margin-left: auto; }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__caption {
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__heading {
+    font-size: 72px;
+    line-height: 0.8;
+    margin: 0 0 1rem;
+  }
+
+  @media (width<= 720px){
+    .banner-overlap-{{ section.id }} .banner-overlap__heading {
+    font-size: 52px;
+  }
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__text {
+    font-size: 1rem;
+    margin: 0 0 1.5rem;
+    max-width: 34ch;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: {{ section.settings.button_background }};
+    color: {{ section.settings.button_text_color }};
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.08);
+    font-size: 0.8rem;
+  }
+
+  /* --- Overlap wrapper: pulls the collection grid up onto the image --- */
+  .banner-overlap-{{ section.id }} .banner-overlap__collection-wrap {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 1.5rem;
+    transform: translateY(calc(-1 * var(--overlap-percentage)));
+    
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__carousel {
+    position: relative;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 24px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06), inset 0 2px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+   
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__carousel-nav {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__carousel-button {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: background 0.15s ease;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__carousel-button:hover {
+    background: #f2f2f2;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__carousel-button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0.5rem;
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card {
+    flex: 0 0 auto;
+    height: {{ section.settings.gallery_height_mobile | default: 260 }}px;
+    scroll-snap-align: start;
+  }
+
+  @media screen and (min-width: 750px) {
+    .banner-overlap-{{ section.id }} .banner-overlap__grid {
+      gap: 1.5rem;
+    }
+
+    .banner-overlap-{{ section.id }} .banner-overlap__card {
+      
+      height: {{ section.settings.gallery_height | default: 420 }}px;
+    }
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card {
+    background: {{ section.settings.card_background }};
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card:hover {
+    /* transform: translateY(-8px) scale(1.02); */
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card-media {
+    position: relative;
+    height: 100%;
+    width: auto;
+    background: #eee;
+    overflow: hidden;
+  }
+  .banner-overlap-{{ section.id }} .banner-overlap__card-image--front {
+  position: static !important;
+  height: 100%;
+  width: auto;
+  display: block;
+  object-fit: contain;
+    }
+  .banner-overlap-{{ section.id }} .banner-overlap__card-media svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card-image--front,
+  .banner-overlap-{{ section.id }} .banner-overlap__card-image--back {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    will-change: transform, clip-path;
+  }
+
+  /* Two-image cards: back image sits underneath, front wipes away via JS */
+  .banner-overlap-{{ section.id }} .banner-overlap__card-media--flippable .banner-overlap__card-image--front {
+    z-index: 2;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card-media--flippable .banner-overlap__card-image--back {
+    z-index: 1;
+    transform: scale(1.08);
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 4;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    color: #fff;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__badge--sale { background: #d94f4f; }
+  .banner-overlap-{{ section.id }} .banner-overlap__badge--new { background: #e07a3f; }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card-info {
+    padding: 0.9rem 1rem 1.1rem;
+    text-align: center;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card-title {
+    font-size: 0.95rem;
+    margin: 0 0 0.35rem;
+    font-weight: 600;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card-price {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .banner-overlap-{{ section.id }} .banner-overlap__card-price s {
+    color: #999;
+    margin-left: 0.4rem;
+    font-weight: 400;
+  }
+
+  @media screen and (max-width: 749px) {
+    .banner-overlap-{{ section.id }} .banner-overlap__collection-wrap {
+      transform: translateY(calc(-1 * var(--overlap-percentage-mobile)));
+    }
+  }
+  @media screen and (max-width: 749px) {
+  #banner-overlap-{{ section.id }} .banner-overlap__heading {
+    font-size: {{ section.settings.heading_size_mobile }}px !important;
+  }
+ }
+{%- endstyle -%}
+
+<div
+  id="banner-overlap-{{ section.id }}"
+  class="banner-overlap-{{ section.id }} page-width-wide section--full-width section
+    section-resource-list
+    spacing-style
+    gap-style"
+>
+  {% comment %} Image banner with text overlay {% endcomment %}
+  <div
+    class="banner-overlap__image-wrap"
+    style="--overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};"
+  >
+    {%- if section.settings.image != blank -%}
+      {{
+        section.settings.image
+        | image_url: width: 3840
+        | image_tag:
+          class: 'banner-overlap__image',
+          widths: '750, 1100, 1500, 2000, 3000, 3840',
+          sizes: '100vw',
+          loading: 'eager'
+      }}
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'banner-overlap__image' }}
+    {%- endif -%}
+
+    <div class="banner-overlap__overlay"></div>
+
+    <div class="banner-overlap__content banner-overlap__content--{{ section.settings.content_position }}">
+      {%- if section.settings.caption != blank -%}
+        <p class="banner-overlap__caption">{{ section.settings.caption }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h2
+            class="banner-overlap__heading"
+            style="
+            color: {{ section.settings.heading_color }};
+            font-size: {{ section.settings.heading_size }}px;
+            font-weight: {{ section.settings.heading_weight }};
+            line-height: {{ section.settings.heading_line_height }};
+            letter-spacing: {{ section.settings.heading_letter_spacing }}px;
+            "
+        >
+            {{ section.settings.heading }}
+        </h2>
+        {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="banner-overlap__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.button_label != blank -%}
+        <a
+          href="{{ section.settings.button_link | default: '#' }}"
+          class="banner-overlap__button"
+          {% if section.settings.open_new_tab %}target="_blank"{% endif %}
+        >
+          {{ section.settings.button_label }}
+          <span class="banner-overlap__button-icon">&#8250;</span>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {% comment %} Featured collection, pulled up over the bottom of the image {% endcomment %}
+  <div
+    class="banner-overlap__collection-wrap"
+    style="--overlap-percentage: {{ section.settings.overlap_percentage }}%; --overlap-percentage-mobile: {{ section.settings.overlap_percentage_mobile }}%;"
+  >
+    <div class="banner-overlap__carousel">
+      <div class="banner-overlap__carousel-nav">
+        <button type="button" class="banner-overlap__carousel-button" data-carousel-prev aria-label="Previous products">&#8249;</button>
+        <button type="button" class="banner-overlap__carousel-button" data-carousel-next aria-label="Next products">&#8250;</button>
+      </div>
+      <ul
+        class="banner-overlap__grid"
+        data-carousel-track
+        style="--columns-desktop: {{ section.settings.columns_desktop }}; --columns-mobile: {{ section.settings.columns_mobile }};"
+      >
+      {%- if section.blocks.size > 0 -%}
+        {%- for block in section.blocks -%}
+            {%- if block.type == 'gallery_image' -%}
+            <li class="banner-overlap__card" {{ block.shopify_attributes }}>
+                {%- if block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}" class="banner-overlap__card-link">
+                {%- endif -%}
+                <div class="banner-overlap__card-media" data-hover-media>
+                    {%- if block.settings.badge_text != blank -%}
+                    <span class="banner-overlap__badge banner-overlap__badge--sale">{{ block.settings.badge_text }}</span>
+                    {%- endif -%}
+
+                    {%- if block.settings.image != blank -%}
+                    {{
+                        block.settings.image
+                        | image_url: width: 700
+                        | image_tag: class: 'banner-overlap__card-image--front', widths: '350, 500, 700', loading: 'lazy'
+                    }}
+                    {%- else -%}
+                    {{ 'product-1' | placeholder_svg_tag: 'banner-overlap__card-image--front' }}
+                    {%- endif -%}
+                </div>
+
+                {%- if block.settings.title != blank or block.settings.subtitle != blank -%}
+                    <div class="banner-overlap__card-info">
+                    {%- if block.settings.title != blank -%}
+                        <p class="banner-overlap__card-title">{{ block.settings.title }}</p>
+                    {%- endif -%}
+                    {%- if block.settings.subtitle != blank -%}
+                        <p class="banner-overlap__card-price">{{ block.settings.subtitle }}</p>
+                    {%- endif -%}
+                    </div>
+                {%- endif -%}
+                {%- if block.settings.link != blank -%}
+                </a>
+                {%- endif -%}
+            </li>
+            {%- endif -%}
+        {%- endfor -%}
+        {%- else -%}
+        {%- for i in (1..4) -%}
+            <li class="banner-overlap__card banner-overlap__card--placeholder">
+            <div class="banner-overlap__card-media">
+                {{ 'product-' | append: i | placeholder_svg_tag: 'banner-overlap__card-image--front' }}
+            </div>
+            <div class="banner-overlap__card-info">
+                <h3 class="banner-overlap__card-title">Image title</h3>
+            </div>
+            </li>
+        {%- endfor -%}
+        {%- endif -%}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var section = document.getElementById('banner-overlap-{{ section.id }}');
+    if (!section) return;
+
+    /* ---------- Carousel ---------- */
+    var track = section.querySelector('[data-carousel-track]');
+    var prevBtn = section.querySelector('[data-carousel-prev]');
+    var nextBtn = section.querySelector('[data-carousel-next]');
+
+    if (track) {
+      var scrollByCard = function (direction) {
+        var card = track.querySelector('.banner-overlap__card');
+        if (!card) return;
+        var gap = parseFloat(getComputedStyle(track).gap) || 0;
+        var amount = card.getBoundingClientRect().width + gap;
+        track.scrollBy({ left: amount * direction, behavior: 'smooth' });
+      };
+
+      var updateButtonState = function () {
+        var maxScroll = track.scrollWidth - track.clientWidth - 1;
+        if (prevBtn) prevBtn.disabled = track.scrollLeft <= 0;
+        if (nextBtn) nextBtn.disabled = track.scrollLeft >= maxScroll;
+      };
+
+      if (prevBtn) prevBtn.addEventListener('click', function () { scrollByCard(-1); });
+      if (nextBtn) nextBtn.addEventListener('click', function () { scrollByCard(1); });
+      track.addEventListener('scroll', updateButtonState);
+      window.addEventListener('resize', updateButtonState);
+      updateButtonState();
+    }
+
+    /* ---------- Premium hover image transition (JS-driven) ---------- */
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function runAnimation(state, targetProgress, duration) {
+      if (state.raf) cancelAnimationFrame(state.raf);
+      var startProgress = state.progress;
+      var startTime = null;
+
+      function step(timestamp) {
+        if (startTime === null) startTime = timestamp;
+        var elapsed = timestamp - startTime;
+        var t = Math.min(elapsed / duration, 1);
+        var eased = easeInOutCubic(t);
+        state.progress = startProgress + (targetProgress - startProgress) * eased;
+        state.render(state.progress);
+
+        if (t < 1) {
+          state.raf = requestAnimationFrame(step);
+        } else {
+          state.progress = targetProgress;
+          state.render(state.progress);
+          state.raf = null;
+        }
+      }
+      state.raf = requestAnimationFrame(step);
+    }
+
+    var mediaEls = section.querySelectorAll('[data-hover-media]');
+
+    mediaEls.forEach(function (media) {
+      var isFlippable = media.classList.contains('banner-overlap__card-media--flippable');
+      var front = media.querySelector('.banner-overlap__card-image--front');
+      var back = media.querySelector('.banner-overlap__card-image--back');
+      var card = media.closest('.banner-overlap__card');
+      if (!card || !front) return;
+
+      var state = { progress: 0, raf: null };
+      var DIAGONAL_SPREAD = 18; // controls the slant of the wipe line
+
+      state.render = function (p) {
+        if (isFlippable && back) {
+          // p: 0 = front fully visible, 1 = front fully wiped away
+          var yLeft = Math.max(0, Math.min(100, p * (100 + DIAGONAL_SPREAD)));
+          var yRight = Math.max(0, Math.min(100, p * (100 + DIAGONAL_SPREAD) - DIAGONAL_SPREAD));
+
+          front.style.clipPath =
+            'polygon(0% ' + yLeft + '%, 100% ' + yRight + '%, 100% 100%, 0% 100%)';
+
+          var frontScale = 1 + p * 0.05;
+          front.style.transform = 'scale(' + frontScale + ')';
+
+          var backScale = 1.08 - p * 0.08;
+          back.style.transform = 'scale(' + backScale + ')';
+        } else {
+          var scale = 1 + p * 0.08;
+          front.style.transform = 'scale(' + scale + ')';
+        }
+      };
+
+      card.addEventListener('mouseenter', function () {
+        runAnimation(state, 1, 650);
+      });
+
+      card.addEventListener('mouseleave', function () {
+        runAnimation(state, 0, 550);
+      });
+
+      state.render(0);
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Image overlap collection",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Banner image"
+    },
+    {
+      "type": "range",
+      "id": "image_height",
+      "min": 300,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "label": "Banner height (desktop)",
+      "default": 620
+    },
+    {
+      "type": "range",
+      "id": "image_height_mobile",
+      "min": 300,
+      "max": 700,
+      "step": 20,
+      "unit": "px",
+      "label": "Banner height (mobile)",
+      "default": 480
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Image overlay opacity",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Content position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Caption"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Goodness in Every Bite"
+    },
+    {
+  "type": "header",
+  "content": "Heading Style"
+    },
+    {
+    "type": "color",
+    "id": "heading_color",
+    "label": "Heading Color",
+    "default": "#ffffff"
+    },
+    {
+    "type": "range",
+    "id": "heading_size",
+    "min": 20,
+    "max": 80,
+    "step": 2,
+    "unit": "px",
+    "label": "Heading Size (Desktop)",
+    "default": 56
+    },
+    {
+    "type": "range",
+    "id": "heading_size_mobile",
+    "min": 16,
+    "max": 48,
+    "step": 2,
+    "unit": "px",
+    "label": "Heading Size (Mobile)",
+    "default": 32
+    },
+    {
+    "type": "range",
+    "id": "heading_weight",
+    "min": 300,
+    "max": 900,
+    "step": 100,
+    "label": "Heading Weight",
+    "default": 700
+    },
+    {
+    "type": "range",
+    "id": "heading_line_height",
+    "min": 0.8,
+    "max": 2,
+    "step": 0.1,
+    "label": "Heading Line Height",
+    "default": 1.1
+    },
+    {
+    "type": "range",
+    "id": "heading_letter_spacing",
+    "min": -2,
+    "max": 10,
+    "step": 0.5,
+    "unit": "px",
+    "label": "Heading Letter Spacing",
+    "default": 0
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Nourish your body and delight your taste buds.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_new_tab",
+      "label": "Open link in new tab",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Featured collection"
+    },
+   
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4,
+      "label": "Columns (desktop)"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns (mobile)",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "overlap_percentage",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlap onto banner (desktop)",
+      "info": "How much of the collection grid sits on top of the image, e.g. 30% overlaps the image and 70% sits below it.",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "overlap_percentage_mobile",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlap onto banner (mobile)",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Section"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 60
+    }
+  ],
+  "blocks": [
+  {
+    "type": "gallery_image",
+    "name": "Image",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+        "default": "Image title"
+      },
+      {
+        "type": "text",
+        "id": "subtitle",
+        "label": "Subtitle (optional)"
+      },
+      {
+        "type": "url",
+        "id": "link",
+        "label": "Link (optional)"
+      },
+      {
+        "type": "text",
+        "id": "badge_text",
+        "label": "Badge text (optional)"
+      }
+    ]
+    }
+    ],
+  "presets": [
+    {
+      "name": "Image overlap collection"
+    }
+  ]
+}
+{% endschema %}
+
