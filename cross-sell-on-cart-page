@@ -1,0 +1,104 @@
+{% comment %} Get the first product in cart {% endcomment %}
+{% assign cart_product = cart.items.first.product %}
+{% assign cart_type = cart_product.type %}
+
+{% comment %} Decide which product types to recommend based on cart product type {% endcomment %}
+{% if cart_type == 'cloth' %}
+  {% assign recommended_types = 'sleeveless,necklace' | split: ',' %}
+
+{% elsif cart_type == 'sleeveless' %}
+  {% assign recommended_types = 'cloth,necklace' | split: ',' %}
+
+{% elsif cart_type == 'hair' %}
+  {% assign recommended_types = 'necklace,cloth' | split: ',' %}
+
+{% elsif cart_type == 'necklace' %}
+  {% assign recommended_types = 'cloth,hair' | split: ',' %}
+
+{% endif %}
+
+{% comment %} Only show section if we have recommendations {% endcomment %}
+{% if recommended_types %}
+
+  <div class="cart-cross-sell">
+    <h3 class="cart-cross-sell__title">You May Also Like</h3>
+
+    <div class="cart-cross-sell__grid">
+
+      {% assign shown = 0 %}
+
+      {% comment %} Loop through each recommended type {% endcomment %}
+      {% for recommended_type in recommended_types %}
+
+        {% comment %} Loop through all products {% endcomment %}
+        {% for product in collections.all.products %}
+
+          {% comment %} Only show if type matches AND not already in cart AND shown less than 3 {% endcomment %}
+          {% if product.type == recommended_type and product.id != cart_product.id and shown < 3 %}
+
+            <div class="cart-cross-sell__item">
+
+              {% comment %} Product Image {% endcomment %}
+              <a href="{{ product.url }}" class="cart-cross-sell__image-link">
+                <div class="cart-cross-sell__image-wrap">
+                  {% if product.featured_image %}
+                    {{ product.featured_image
+                      | image_url: width: 300
+                      | image_tag:
+                        alt: product.title,
+                        loading: 'lazy',
+                        class: 'cart-cross-sell__image' }}
+                  {% else %}
+                    <div class="cart-cross-sell__no-image">No Image</div>
+                  {% endif %}
+                </div>
+              </a>
+
+              {% comment %} Product Info {% endcomment %}
+              <div class="cart-cross-sell__details">
+                <div class="cart-cross-sell__info">
+                  <a href="{{ product.url }}">
+                    <p class="cart-cross-sell__product-title">{{ product.title }}</p>
+                  </a>
+                  <p class="cart-cross-sell__price">
+                    {{ product.price | money }}
+                  </p>
+                </div>
+
+                {% comment %} Add to Cart Form {% endcomment %}
+                {% if product.available %}
+                  <form action="{{ routes.cart_add_url }}" method="post" class="cart-cross-sell__form">
+                    <input
+                      type="hidden"
+                      name="id"
+                      value="{{ product.selected_or_first_available_variant.id }}"
+                    >
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="cart-cross-sell__btn">
+                      Add to Cart
+                    </button>
+                  </form>
+                {% else %}
+                  <button class="cart-cross-sell__btn cart-cross-sell__btn--soldout" disabled>
+                    Sold Out
+                  </button>
+                {% endif %}
+
+              </div>
+            </div>
+
+            {% comment %} Increase counter {% endcomment %}
+            {% assign shown = shown | plus: 1 %}
+
+          {% endif %}
+        {% endfor %}
+
+        {% comment %} Stop outer loop if we already have 3 products {% endcomment %}
+        {% if shown >= 3 %}{% break %}{% endif %}
+
+      {% endfor %}
+
+    </div>
+  </div>
+
+{% endif %}
