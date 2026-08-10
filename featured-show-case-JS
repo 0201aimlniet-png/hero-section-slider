@@ -1,0 +1,135 @@
+class FeatureShowcase extends HTMLElement {
+  constructor() {
+    super();
+    this.tabs = Array.from(this.querySelectorAll('.feature-showcase__tab'));
+    this.panels = Array.from(this.querySelectorAll('.feature-showcase__panel'));
+    this.mediaInner = this.querySelector('.feature-showcase__media-inner');
+
+    this.onTabClick = this.onTabClick.bind(this);
+    this.onTabHover = this.onTabHover.bind(this);
+    this.onTabKeydown = this.onTabKeydown.bind(this);
+  }
+
+  connectedCallback() {
+    this.tabs.forEach((tab) => {
+      tab.addEventListener('click', this.onTabClick);
+      tab.addEventListener('mouseenter', this.onTabHover);
+      tab.addEventListener('keydown', this.onTabKeydown);
+    });
+
+    if (this.mediaInner && 'ResizeObserver' in window) {
+      this.resizeObserver = new ResizeObserver(() => this.updateMediaHeight());
+      this.resizeObserver.observe(this.mediaInner);
+    } else {
+      // Fallback for older browsers without ResizeObserver
+      this.onResize = this.updateMediaHeight.bind(this);
+      window.addEventListener('resize', this.onResize);
+    }
+
+    this.updateMediaHeight();
+  }
+
+  disconnectedCallback() {
+    this.tabs.forEach((tab) => {
+      tab.removeEventListener('click', this.onTabClick);
+      tab.removeEventListener('mouseenter', this.onTabHover);
+      tab.removeEventListener('keydown', this.onTabKeydown);
+    });
+
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    if (this.onResize) {
+      window.removeEventListener('resize', this.onResize);
+    }
+  }
+
+  onTabClick(event) {
+    const tab = event.currentTarget;
+    this.activate(tab.dataset.fsIndex);
+  }
+
+  onTabHover(event) {
+    const tab = event.currentTarget;
+    this.activate(tab.dataset.fsIndex);
+  }
+
+  onTabKeydown(event) {
+    const currentIndex = this.tabs.findIndex((tab) => tab === event.currentTarget);
+    let newIndex = null;
+
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        newIndex = (currentIndex + 1) % this.tabs.length;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        newIndex = (currentIndex - 1 + this.tabs.length) % this.tabs.length;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
+      case 'End':
+        newIndex = this.tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    const targetTab = this.tabs[newIndex];
+    targetTab.focus();
+    this.activate(targetTab.dataset.fsIndex);
+  }
+
+  activate(index) {
+    this.tabs.forEach((tab) => {
+      const isActive = tab.dataset.fsIndex === index;
+      tab.classList.toggle('is-active', isActive);
+      tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      tab.tabIndex = isActive ? 0 : -1;
+    });
+
+    this.panels.forEach((panel) => {
+      const isActive = panel.dataset.fsIndex === index;
+      panel.classList.toggle('is-active', isActive);
+      if (isActive) {
+        panel.removeAttribute('hidden');
+      } else {
+        window.setTimeout(() => {
+          if (!panel.classList.contains('is-active')) {
+            panel.setAttribute('hidden', '');
+          }
+        }, 420);
+      }
+    });
+
+    requestAnimationFrame(() => this.updateMediaHeight());
+  }
+
+  updateMediaHeight() {
+    if (!this.mediaInner) return;
+
+    const activePanel = this.panels.find((panel) => panel.classList.contains('is-active'));
+    if (!activePanel) return;
+
+    const img = activePanel.querySelector('img');
+    if (!img) return;
+
+    const setHeight = () => {
+      const containerWidth = this.mediaInner.getBoundingClientRect().width;
+      if (!containerWidth || !img.naturalWidth) return;
+      const ratio = img.naturalHeight / img.naturalWidth;
+      this.mediaInner.style.height = Math.round(containerWidth * ratio) + 'px';
+    };
+
+    if (img.complete && img.naturalWidth) {
+      setHeight();
+    } else {
+      img.addEventListener('load', setHeight, { once: true });
+    }
+  }
+}
+
+customElements.define('feature-showcase', FeatureShowcase);
