@@ -71,7 +71,7 @@
               flex-direction: column;
               justify-content: center;
               padding: 5% 6%;
-              max-width: 740px;
+              max-width: 825px;
               color: {{ section.settings.text_color }};
             }
 
@@ -340,6 +340,51 @@
          .page-wrapper {
     overflow-x: hidden;
   }
+/* .banner-overlap-{{ section.id }} .banner-overlap__heading-static {
+  display: block;
+} */
+
+.banner-overlap-{{ section.id }} .banner-overlap__heading-rotating {
+  display: inline-block;
+  min-height: 1em;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+  white-space: normal;
+}
+
+/* Cursor */
+.banner-overlap-{{ section.id }} .banner-overlap__heading-rotating::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 0.85em;
+  margin-left: 5px;
+  vertical-align: -0.05em;
+  background: currentColor;
+  animation: banner-overlap-cursor-{{ section.id }} 0.8s steps(1) infinite;
+}
+
+/* Cursor blinking */
+@keyframes banner-overlap-cursor-{{ section.id }} {
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+/* Fade sentence before next one */
+.banner-overlap-{{ section.id }} .banner-overlap__heading-rotating.is-hiding {
+  opacity: 0;
+}
+
+/* Hidden source text */
+.banner-overlap-{{ section.id }} .banner-overlap__rotating-source {
+  display: none !important;
+}
 {%- endstyle -%}
 
 <div
@@ -394,19 +439,44 @@
         <p class="banner-overlap__caption">{{ section.settings.caption }}</p>
       {%- endif -%}
 
-      {%- if section.settings.heading != blank -%}
-        <h2
-          class="banner-overlap__heading"
-          style="
-            color: {{ section.settings.heading_color }};
-            font-size: {{ section.settings.heading_size }}px;
-            font-weight: {{ section.settings.heading_weight }};
-            line-height: {{ section.settings.heading_line_height }};
-            letter-spacing: {{ section.settings.heading_letter_spacing }}px;
-          "
-        >
-          {{ section.settings.heading }}
-        </h2>
+      {%- if section.settings.heading != blank or section.settings.rotating_texts != blank -%}
+      <h2
+        class="banner-overlap__heading"
+        style="
+          color: {{ section.settings.heading_color }};
+          font-size: {{ section.settings.heading_size }}px;
+          font-weight: {{ section.settings.heading_weight }};
+          line-height: {{ section.settings.heading_line_height }};
+          letter-spacing: {{ section.settings.heading_letter_spacing }}px;
+        "
+      >
+
+    {%- if section.settings.heading != blank -%}
+      <span class="banner-overlap__heading-static">
+        {{ section.settings.heading }}
+      </span>
+        {%- endif -%}
+
+        {%- if section.settings.rotating_texts != blank -%}
+
+          <span
+            class="banner-overlap__heading-rotating"
+            style="color: {{ section.settings.rotating_color }};"
+            data-speed="{{ section.settings.typewriter_speed }}"
+            data-pause="{{ section.settings.typewriter_pause }}"
+            aria-live="polite"
+          ></span>
+
+          <span
+            class="banner-overlap__rotating-source"
+            hidden
+          >
+            {{ section.settings.rotating_texts | escape }}
+          </span>
+
+        {%- endif -%}
+
+      </h2>
       {%- endif -%}
 
       {%- if section.settings.text != blank -%}
@@ -504,12 +574,176 @@
     </div>
   </div>
 </div>
+<script>
+  function initBannerOverlapTypewriter(section) {
+    if (!section) return;
 
+    var rotatingEl = section.querySelector(
+      '.banner-overlap__heading-rotating'
+    );
+
+    var sourceEl = section.querySelector(
+      '.banner-overlap__rotating-source'
+    );
+
+    if (!rotatingEl || !sourceEl) return;
+
+    /* Prevent duplicate initialization */
+    if (rotatingEl.dataset.typewriterInitialized === 'true') {
+      return;
+    }
+
+    rotatingEl.dataset.typewriterInitialized = 'true';
+
+    /* -----------------------------------------
+       Get sentences
+       One sentence per line in Theme Editor
+       ----------------------------------------- */
+
+    var words = sourceEl.textContent
+      .split(/\r?\n/)
+      .map(function (word) {
+        return word.trim();
+      })
+      .filter(function (word) {
+        return word.length > 0;
+      });
+
+    if (!words.length) return;
+
+    /* -----------------------------------------
+       Settings
+       ----------------------------------------- */
+
+    var typingSpeed =
+      parseInt(rotatingEl.dataset.speed, 10) || 70;
+
+    var pauseDuration =
+      parseInt(rotatingEl.dataset.pause, 10) || 2000;
+
+    var wordIndex = 0;
+
+    /* -----------------------------------------
+       Type one sentence
+       ----------------------------------------- */
+
+    function typeSentence(sentence, callback) {
+      var characterIndex = 0;
+
+      rotatingEl.classList.remove('is-hiding');
+      rotatingEl.textContent = '';
+
+      function typeNextCharacter() {
+        if (characterIndex < sentence.length) {
+          rotatingEl.textContent += sentence.charAt(characterIndex);
+
+          characterIndex++;
+
+          window.setTimeout(
+            typeNextCharacter,
+            typingSpeed
+          );
+        } else {
+          /*
+           * Sentence is completely typed.
+           * Keep it visible for pauseDuration.
+           */
+          window.setTimeout(function () {
+            hideSentence(callback);
+          }, pauseDuration);
+        }
+      }
+
+      typeNextCharacter();
+    }
+
+    /* -----------------------------------------
+       Hide complete sentence
+       ----------------------------------------- */
+
+    function hideSentence(callback) {
+      rotatingEl.classList.add('is-hiding');
+
+      window.setTimeout(function () {
+        rotatingEl.textContent = '';
+        rotatingEl.classList.remove('is-hiding');
+
+        callback();
+      }, 300);
+    }
+
+    /* -----------------------------------------
+       Start next sentence
+       ----------------------------------------- */
+
+    function showNextSentence() {
+      var currentSentence = words[wordIndex];
+
+      wordIndex++;
+
+      if (wordIndex >= words.length) {
+        wordIndex = 0;
+      }
+
+      typeSentence(
+        currentSentence,
+        showNextSentence
+      );
+    }
+
+    /* Start */
+    showNextSentence();
+  }
+
+
+  /* =========================================
+     INITIALIZE BANNER
+     ========================================= */
+
+  function initializeBannerOverlapTypewriters() {
+    document
+      .querySelectorAll('[id^="banner-overlap-"]')
+      .forEach(function (section) {
+        initBannerOverlapTypewriter(section);
+      });
+  }
+
+
+  /* Normal page load */
+  if (document.readyState === 'loading') {
+    document.addEventListener(
+      'DOMContentLoaded',
+      initializeBannerOverlapTypewriters
+    );
+  } else {
+    initializeBannerOverlapTypewriters();
+  }
+
+
+  /* =========================================
+     SHOPIFY THEME EDITOR SUPPORT
+     ========================================= */
+
+  document.addEventListener(
+    'shopify:section:load',
+    function (event) {
+      var section = event.target;
+
+      if (
+        section &&
+        section.id &&
+        section.id.indexOf('shopify-section-') === 0
+      ) {
+        initBannerOverlapTypewriter(section);
+      }
+    }
+  );
+</script>
 <script>
   (function () {
     var section = document.getElementById('banner-overlap-{{ section.id }}');
     if (!section) return;
-
+    initBannerOverlapTypewriter(section)
     /* ---------- Carousel ---------- */
     var track = section.querySelector('[data-carousel-track]');
     var prevBtn = section.querySelector('[data-carousel-prev]');
@@ -733,6 +967,39 @@
       "id": "heading",
       "label": "Heading",
       "default": "Goodness in Every Bite"
+    },
+    {
+      "type": "textarea",
+      "id": "rotating_texts",
+      "label": "Rotating heading text",
+      "info": "Enter one sentence or phrase per line.",
+      "default": "High Converting Stores\nBetter Shopify Experiences\nPremium Store Design"
+    },
+    {
+      "type": "range",
+      "id": "typewriter_speed",
+      "min": 20,
+      "max": 200,
+      "step": 10,
+      "unit": "ms",
+      "label": "Typing speed",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "typewriter_pause",
+      "min": 500,
+      "max": 5000,
+      "step": 250,
+      "unit": "ms",
+      "label": "Pause after sentence",
+      "default": 2000
+    },
+    {
+      "type": "color",
+      "id": "rotating_color",
+      "label": "Rotating text color",
+      "default": "#7DD3FC"
     },
     {
       "type": "header",
